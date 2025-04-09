@@ -13,7 +13,8 @@ namespace ApiProjectTaskManagement
     {
         public static void Main(string[] args)
         {
-            CreateHostBuilder(args).Build().Run();
+           
+CreateHostBuilder(args).Build().Run();
 
         }
 

@@ -14,7 +14,7 @@ namespace ApiProjectTaskManagement.Services
             _taskRepository = taskRepository;
         }
 
-        public async Task<IEnumerable<TaskModel>> GetAllTasks() => await _taskRepository.GetAllTasks();
+        public async Task<IEnumerable<TaskModel>> GetAllTasks() =>await _taskRepository.GetAllTasks();
 
         public async Task<TaskModel> GetTaskById(int id) => await _taskRepository.GetTaskById(id);
 
