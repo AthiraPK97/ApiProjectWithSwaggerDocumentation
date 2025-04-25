@@ -13,6 +13,7 @@ namespace ApiProjectTaskManagement.Data
             public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
             public DbSet<TaskModel> Tasks { get; set; }
-        }
+        //public DbSet<Employee> Employees { get; set; }
+    }
     
 }

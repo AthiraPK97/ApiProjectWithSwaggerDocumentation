@@ -13,6 +13,8 @@ using Microsoft.OpenApi.Models;
 using System.Reflection;
 using System.IO;
 using System;
+using ApiProjectTaskManagement.Interfaces;
+using Octopus.Client.Repositories;
 
 namespace ApiProjectTaskManagement
 {
@@ -31,7 +33,8 @@ namespace ApiProjectTaskManagement
 
             services.AddDbContext<ApplicationDbContext>(options =>
             options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
-            services.AddScoped<ITaskRepository, TaskRepository>();
+            services.AddScoped(typeof(ITaskRepository<>), typeof(TaskRepository<>));
+             services.AddScoped<IUnitOfWork, UnitOfWork>();
             services.AddScoped<ITaskService, TaskService>();
             services.AddControllers();
             // Swagger configuration

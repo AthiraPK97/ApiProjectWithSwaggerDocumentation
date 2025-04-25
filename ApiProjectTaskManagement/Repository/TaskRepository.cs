@@ -4,44 +4,26 @@ using System.Threading.Tasks;
 using ApiProjectTaskManagement.Data;
 using ApiProjectTaskManagement.Models;
 using Microsoft.EntityFrameworkCore;
+using ApiProjectTaskManagement.Data;
+using ApiProjectTaskManagement.Interfaces;
 
 namespace ApiProjectTaskManagement.Repository
 {
-    public class TaskRepository : ITaskRepository
+    public class TaskRepository<T> : ITaskRepository<T> where T : class
     {
-        private readonly ApplicationDbContext _context;
+        protected readonly ApplicationDbContext _context;
+        private readonly DbSet<T> _dbSet;
 
         public TaskRepository(ApplicationDbContext context)
         {
             _context = context;
+            _dbSet = _context.Set<T>();
         }
 
-        public async Task<IEnumerable<TaskModel>> GetAllTasks() =>
-            await _context.Tasks.ToListAsync();
-
-        public async Task<TaskModel> GetTaskById(int id) =>
-            await _context.Tasks.FindAsync(id);
-
-        public async Task<TaskModel> AddTask(TaskModel task)
-        {
-            _context.Tasks.Add(task);
-            await _context.SaveChangesAsync();
-            return task;
-        }
-
-        public async Task<bool> UpdateTask(TaskModel task)
-        {
-            _context.Tasks.Update(task);
-            return await _context.SaveChangesAsync() > 0;
-        }
-
-        public async Task<bool> DeleteTask(int id)
-        {
-            var task = await _context.Tasks.FindAsync(id);
-            if (task == null) return false;
-
-            _context.Tasks.Remove(task);
-            return await _context.SaveChangesAsync() > 0;
-        }
+        public async Task<IEnumerable<T>> GetAllAsync() => await _dbSet.ToListAsync();
+        public async Task<T> GetByIdAsync(int id) => await _dbSet.FindAsync(id);
+        public async Task AddAsync(T entity) => await _dbSet.AddAsync(entity);
+        public void Update(T entity) => _dbSet.Update(entity);
+        public void Delete(T entity) => _dbSet.Remove(entity);
     }
 }

@@ -4,12 +4,13 @@ using ApiProjectTaskManagement.Models;
 
 namespace ApiProjectTaskManagement.Repository
 {
-    public interface ITaskRepository
-    {
-        Task<IEnumerable<TaskModel>> GetAllTasks();
-        Task<TaskModel> GetTaskById(int id);
-        Task<TaskModel> AddTask(TaskModel task);
-        Task<bool> UpdateTask(TaskModel task);
-        Task<bool> DeleteTask(int id);
+        public interface ITaskRepository<T> where T : class
+        {
+            Task<IEnumerable<T>> GetAllAsync();
+            Task<T> GetByIdAsync(int id);
+            Task AddAsync(T entity);
+            void Update(T entity);
+            void Delete(T entity);
+        }
     }
-}
+

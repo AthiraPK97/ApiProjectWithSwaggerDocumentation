@@ -4,92 +4,34 @@ using System.Threading.Tasks;
 using ApiProjectTaskManagement.Models;
 using ApiProjectTaskManagement.Services;
 using System;
+using ApiProjectTaskManagement.Interfaces;
 
 namespace ApiProjectTaskManagement.Controllers
 {
-    [Route("api/[controller]")]
     [ApiController]
+    [Route("api/[controller]")]
     public class TaskController : ControllerBase
     {
-        private readonly ITaskService _taskService;
+        private readonly IUnitOfWork _unitOfWork;
 
-        public TaskController(ITaskService taskService)
+        public TaskController(IUnitOfWork unitOfWork)
         {
-            _taskService = taskService;
+            _unitOfWork = unitOfWork;
         }
 
         [HttpGet]
-        public async Task<ActionResult<IEnumerable<TaskModel>>> GetAllTasks()
+        public async Task<IActionResult> Get()
         {
-            try
-            {
-                var tasks = await _taskService.GetAllTasks();
-                return Ok(tasks);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while fetching tasks.", error = ex.Message });
-            }
-        }
-
-        [HttpGet("{id}")]
-        public async Task<ActionResult<TaskModel>> GetTaskById(int id)
-        {
-            try
-            {
-                var task = await _taskService.GetTaskById(id);
-                if (task == null) return NotFound(new { message = "Task not found." });
-                return Ok(task);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while fetching the task.", error = ex.Message });
-            }
+            var _task = await _unitOfWork.Task.GetAllAsync();
+            return Ok(_task);
         }
 
         [HttpPost]
-        public async Task<ActionResult<TaskModel>> AddTask(TaskModel task)
+        public async Task<IActionResult> Post(TaskModel _task)
         {
-            try
-            {
-                var createdTask = await _taskService.AddTask(task);
-                return CreatedAtAction(nameof(GetTaskById), new { id = createdTask.Id }, createdTask);
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while adding the task.", error = ex.Message });
-            }
-        }
-
-        [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateTask(int id, TaskModel task)
-        {
-            if (id != task.Id) return BadRequest(new { message = "Task ID mismatch." });
-
-            try
-            {
-                var result = await _taskService.UpdateTask(task);
-                return result ? NoContent() : NotFound(new { message = "Task not found." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while updating the task.", error = ex.Message });
-            }
-        }
-
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteTask(int id)
-        {
-            try
-            {
-                var result = await _taskService.DeleteTask(id);
-                return result ? NoContent() : NotFound(new { message = "Task not found." });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An error occurred while deleting the task.", error = ex.Message });
-            }
+            await _unitOfWork.Task.AddAsync(_task);
+            await _unitOfWork.CompleteAsync();
+            return CreatedAtAction(nameof(Get), new { id = _task.Id }, _task);
         }
     }
 }
- 
